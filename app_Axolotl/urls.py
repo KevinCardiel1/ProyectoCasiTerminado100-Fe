@@ -43,9 +43,9 @@ urlpatterns = [
     path('admin_panel/detalles_pedidos/borrar/<int:detalle_id>/', views.borrar_detalle_pedido, name='borrar_detalle_pedido'),
     
     # URLs del Frontend de AxolotlMusic
-    path('', views.login_frontend, name='root_login'), # Root -> login
+    path('login/', views.login_frontend, name='root_login'), # Root -> login
     path('login/', views.login_frontend, name='login_frontend'), # Página de login del frontend
-    path('index/', views.index_frontend, name='index_frontend'), # Página principal del frontend
+    path('', views.index_frontend, name='index_frontend'), # Página principal del frontend
     path('logout/', views.logout_view, name='logout'),
     path('register/', views.register_view, name='register'),
     path('artistas/', views.artistas_frontend, name='artistas_frontend'),
