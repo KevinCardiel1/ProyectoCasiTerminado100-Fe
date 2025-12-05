@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ artista.nombre_artista }} - AXOLOTL MUSIC</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <style>
+        .artista-detalle-container { max-width: 700px; margin: 30px auto; background: #fff0fa; border-radius: 10px; box-shadow: 0 2px 8px #0002; padding: 24px; }
+        .artista-header { display: flex; align-items: center; gap: 24px; }
+        .artista-foto { width: 120px; height: 120px; object-fit: cover; border-radius: 50%; border: 2px solid #ff69b4; background: #fff; }
+        .artista-nombre { font-size: 2em; color: #e91e63; margin: 0; }
+        .artista-desc { color: #222; margin-top: 10px; }
+        .productos-lista { margin-top: 32px; }
+        .producto-card { background: #fff; border: 1px solid #eee; border-radius: 8px; margin-bottom: 16px; padding: 16px; display: flex; align-items: center; gap: 16px; }
+        .producto-img { width: 60px; height: 60px; object-fit: cover; border-radius: 8px; border: 1px solid #eee; }
+        .producto-info { flex: 1; }
+        .producto-nombre { font-weight: bold; color: #333; }
+        .producto-genero { color: #888; font-size: 0.95em; }
+    </style>
+</head>
+<body>
+    {% include 'navbar.html' %}
+    <div style="max-width:700px;margin:36px auto 0 auto; flex:1;">
+        <div style="background:#ffe6fa;border-radius:20px;box-shadow:0 2px 12px #0001;padding:36px 24px 28px 24px;display:flex;flex-direction:column;align-items:center;">
+            {% if artista.foto %}
+                <img src="{{ artista.foto.url }}" alt="{{ artista.nombre_artista }}" style="width:120px;height:120px;object-fit:cover;border-radius:50%;border:3px solid #ff69b4;background:#fff;box-shadow:0 2px 8px #e91e634;">
+            {% else %}
+                <div style="width:120px;height:120px;border-radius:50%;background:#ffe4ef;display:flex;align-items:center;justify-content:center;color:#e91e63;font-size:2.5em;">?</div>
+            {% endif %}
+            <h1 style="color:#e91e63;font-size:2.3em;margin:18px 0 0 0;font-weight:800;text-align:center;text-decoration:none;cursor:default;">{{ artista.nombre_artista }}</h1>
+            <div style="color:#222;font-size:1.15em;margin:8px 0 0 0;text-align:center;">Cantante Pop</div>
+        </div>
+        <div style="margin-top:32px;">
+            <h2 style="color:#2b0030;font-size:1.3em;margin-bottom:18px;">Productos de {{ artista.nombre_artista }}</h2>
+            {% if productos %}
+                <div style="background:#fff;border-radius:14px;padding:18px 12px;box-shadow:0 1px 6px #0001;">
+                {% for producto in productos %}
+                    <div style="display:flex;align-items:center;gap:16px;margin-bottom:12px;">
+                        <div style="width:60px;height:60px;border-radius:8px;background:#f8bbd0;display:flex;align-items:center;justify-content:center;color:#fff;font-size:1.5em;">
+                            ♪
+                        </div>
+                        <div style="flex:1;">
+                            <div style="font-weight:bold;color:#333;">{{ producto.nombre_producto }}</div>
+                            <div style="color:#888;font-size:0.98em;">Género: {{ producto.get_genero_display }} | Tipo: {{ producto.get_tipo_display }}</div>
+                        </div>
+                    </div>
+                {% endfor %}
+                </div>
+            {% else %}
+                <p>No hay productos para este artista.</p>
+            {% endif %}
+        </div>
+    </div>
+    {% include 'footer.html' %}
+</body>
+</html>

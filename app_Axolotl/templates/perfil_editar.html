@@ -1,0 +1,91 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Editar Perfil - AXOLOTL MUSIC</title>
+    <link rel="stylesheet" href="{% static 'style.css' %}">
+    <style>
+        :root{--pink-1:#ffdff3;--pink-2:#ff66cc;--muted:#8b5a7a}
+        body{background:#fff;color:#111;font-family:Arial,Helvetica,sans-serif}
+        .profile-wrapper{max-width:920px;margin:28px auto;padding:12px;box-sizing:border-box}
+        .profile-card{background:#fff;border-radius:12px;overflow:hidden;border:1px solid rgba(255,102,204,0.12);box-shadow:0 8px 24px rgba(0,0,0,0.06)}
+        .profile-header{background:linear-gradient(90deg,var(--pink-1),var(--pink-2));display:flex;align-items:center;gap:12px;padding:16px 20px}
+        .profile-header img{width:44px;height:44px;border-radius:8px}
+        .profile-header h2{margin:0;color:#fff;font-size:20px;letter-spacing:1px}
+        .profile-body{display:block;padding:24px}
+        .profile-form{width:100%;display:flex;flex-direction:column;gap:12px}
+        .profile-form label{font-weight:700;color:var(--muted);font-size:13px}
+        .profile-form input[type="text"], .profile-form input[type="email"], .profile-form input[type="tel"], .profile-form input[type="number"], .profile-form textarea{width:100%;padding:10px 12px;border-radius:8px;border:1px solid rgba(0,0,0,0.08);background:#fff;color:#111}
+        .profile-form textarea{min-height:90px}
+        .profile-form input[type="file"]{padding:6px}
+        .actions{display:flex;gap:12px;align-items:center;margin-top:6px}
+        /* Remove number input spinners (postal code) */
+        input[type="number"]::-webkit-outer-spin-button,
+        input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        input[type="number"] {
+            -moz-appearance: textfield;
+        }
+        .btn-primary{background:linear-gradient(90deg,var(--pink-2),#ffb3dc);color:#2b0030;padding:10px 16px;border-radius:10px;border:none;font-weight:800;cursor:pointer}
+        .btn-cancel{background:transparent;color:#111;padding:8px 12px;border-radius:8px;border:1px solid rgba(0,0,0,0.06);text-decoration:none;font-weight:700}
+        .muted-note{color:var(--muted);font-size:13px;text-align:left}
+        @media (max-width:800px){.profile-body{padding:18px}}
+    </style>
+</head>
+<body style="display:flex;flex-direction:column;min-height:100vh;">
+    {% include 'navbar.html' %}
+    <main class="profile-wrapper" style="flex:1;">
+        <div class="profile-card">
+            <div class="profile-header">
+                <img src="{% static 'vinyl.svg' %}" alt="logo">
+                <h2>Editar perfil</h2>
+                <div style="margin-left:auto;color:#fff;font-weight:800">AXOLOTL MUSIC</div>
+            </div>
+            <div class="profile-body">
+                <form method="post" enctype="multipart/form-data" class="profile-form">
+                    {% csrf_token %}
+                    <div>
+                        {{ form.nombre.label_tag }}
+                        {{ form.nombre }}
+                        {{ form.nombre.errors }}
+                    </div>
+                    <div>
+                        {{ form.email.label_tag }}
+                        {{ form.email }}
+                        {{ form.email.errors }}
+                    </div>
+                    <div>
+                        {{ form.tel.label_tag }}
+                        {{ form.tel }}
+                        {{ form.tel.errors }}
+                    </div>
+                    <div>
+                        {{ form.direccion.label_tag }}
+                        {{ form.direccion }}
+                        {{ form.direccion.errors }}
+                    </div>
+                    <div>
+                        {{ form.codigo_postal.label_tag }}
+                        {{ form.codigo_postal }}
+                        {{ form.codigo_postal.errors }}
+                    </div>
+                    <div>
+                        {{ form.profile_image.label_tag }}
+                        {{ form.profile_image }}
+                        {{ form.profile_image.errors }}
+                    </div>
+                    <div class="actions">
+                        <button type="submit" class="btn-primary">Guardar</button>
+                        <a href="{% url 'perfil_usuario' %}" class="btn-cancel">Cancelar</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </main>
+    {% include 'footer.html' %}
+</body>
+</html>

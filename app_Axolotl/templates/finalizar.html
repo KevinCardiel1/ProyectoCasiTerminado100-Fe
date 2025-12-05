@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+{% load static %}
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Finalizar Compra - AXOLOTL MUSIC</title>
+    <link rel="stylesheet" href="{% static 'style.css' %}">
+    <style>
+        body { background: #ffdff3; color: #2b0030; font-family: Arial, sans-serif; margin: 0; }
+        .finalizar-container {
+            max-width: 600px; margin: 40px auto; padding: 30px;
+            background: #fff0fa; border-radius: 16px; box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        h2 { text-align: center; color: #c51a8d; }
+        label { font-weight: bold; display: block; margin-top: 10px; }
+        input, select, textarea {
+            width: 100%; padding: 10px; margin-top: 4px; border-radius: 8px; border: 2px solid #c51a8d; background: #fff;
+            box-sizing: border-box;
+        }
+        .btn {
+            padding: 10px 24px; border: none; border-radius: 25px; font-weight: bold; cursor: pointer;
+            transition: background 0.3s;
+        }
+        .btn:hover { filter: brightness(1.05); }
+        .btn.confirmar { background: linear-gradient(90deg, #5a005a, #c51a8d); color:#fff; }
+        .btn.cancelar { background: #c51a8d; color:#fff; }
+        .resumen { text-align: center; margin-bottom: 20px; background: #fff; border-radius: 10px; padding: 10px; }
+        .campo-pago { margin-top: 12px; padding: 12px; background: #fff; border-radius: 10px; border: 1px dashed #e0a4d1; }
+        .oculto { display: none; }
+        .mensaje { text-align: center; padding: 16px; border-radius: 10px; margin-top: 12px; }
+        .mensaje.exito { background: linear-gradient(90deg,#dff6e9,#eafff3); color: #0a6b3a; border: 2px solid #a6e3bf; }
+        .fila-peq { display:flex; gap:8px; }
+        .fila-peq input { flex:1; }
+        small { color:#7a007a; display:block; margin-top:6px; }
+        .volver-btn {
+            display:inline-block; margin-top:12px; padding:10px 16px; border-radius:12px;
+            background: #c51a8d; color:#fff; text-decoration:none; font-weight:600;
+        }
+    </style>
+</head>
+<body style="display:flex;flex-direction:column;min-height:100vh;">
+<div class="finalizar-container" id="contenedor" style="flex:1;">
+    <h2>Finalizar Compra</h2>
+    <!-- Resumen visible: cantidad + total reales si hay carrito, o producto/precio si compra individual -->
+    <div class="resumen">
+        {% if cart_exists %}
+            <p><b>Cantidad total:</b> {{ cart_quantity }}</p>
+            <p><b>Total:</b> ${{ cart_total|floatformat:2 }} MXN</p>
+        {% else %}
+            <p><b>Producto:</b> {{ producto|default:"—" }}</p>
+            <p><b>Precio:</b> ${{ precio|default:"—" }} MXN</p>
+        {% endif %}
+    </div>
+    <form id="form-compra" method="post" action="{% url 'crear_pedido_publico' %}" novalidate>
+        {% csrf_token %}
+        <!-- Datos del producto (ocultos) -->
+        <input type="hidden" name="artista" value="{{ artista }}">
+        <input type="hidden" name="producto" value="{{ producto }}">
+        {# Si existe carrito en contexto, enviar total y cantidad reales #}
+        {% if cart_exists %}
+            <input type="hidden" name="precio" value="{{ cart_total }}">
+            <input type="hidden" name="cantidad" value="{{ cart_quantity }}">
+        {% else %}
+            <input type="hidden" name="precio" value="{{ precio }}">
+            <input type="hidden" name="cantidad" value="1">
+        {% endif %}
+        <label for="nombre">Nombre completo:</label>
+        <input id="nombre" name="nombre" type="text" placeholder="Tu nombre " required>
+
+        <label for="direccion">Dirección de envío:</label>
+        <textarea id="direccion" name="direccion" rows="3" placeholder="Dirección" required></textarea>
+
+        <label for="email">Correo electrónico:</label>
+        <input id="email" name="email" type="email" placeholder="correo@ejemplo.com" required>
+
+        <label for="metodo">Método de pago:</label>
+        <select id="metodo" name="metodo" required>
+            <option value="">Seleccionar...</option>
+            <option value="tarjeta">Tarjeta de crédito / débito</option>
+            <option value="paypal">PayPal</option>
+            <option value="deposito">Depósito bancario</option>
+        </select>
+
+        <!-- Botones: Confirmar y Cancelar -->
+        <div style="display:flex; gap:12px; margin-top:20px;">
+            <button type="submit" class="btn confirmar" style="flex:1;">Confirmar Compra</button>
+            <button type="button" class="btn cancelar" style="flex:1;" onclick="history.back()">Cancelar Compra</button>
+        </div>
+    </form>
+
+    <div id="mensaje-salida" aria-live="polite"></div>
+</div>
+
+<script>
+const form = document.getElementById("form-compra");
+const salida = document.getElementById("mensaje-salida");
+
+form.addEventListener('submit', function(ev) {
+    ev.preventDefault();
+    // Validar HTML5: campos con `required` fallarán si están vacíos
+    if (!form.checkValidity()) {
+        // Dejar que el navegador muestre mensajes de validación
+        form.reportValidity();
+        return;
+    }
+
+    // Enviar el formulario al servidor para crear el pedido y luego redirigir desde el servidor
+    form.submit();
+});
+
+/* Función para escapar HTML de querystring */
+function escapeHtml(str) {
+    if (!str) return '';
+    return String(str)
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#039;');
+}
+</script>

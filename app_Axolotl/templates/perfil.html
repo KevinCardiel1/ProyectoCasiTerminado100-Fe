@@ -1,0 +1,182 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Perfil - AXOLOTL MUSIC</title>
+    <link rel="stylesheet" href="{% static 'style.css' %}">
+    <style>
+        body {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            background: linear-gradient(135deg, #ffe6f6 0%, #ff66cc 60%, #c51a8d 100%);
+            color: #2b0030;
+        }
+        main {
+            flex: 1;
+        }
+        .perfil-container {
+            max-width: 600px;
+            margin: 48px auto;
+            background: #fff0fa;
+            border-radius: 18px;
+            box-shadow: 0 6px 32px rgba(200,0,100,0.10);
+            padding: 36px 32px 28px 32px;
+        }
+        .perfil-header {
+            display: flex;
+            gap: 24px;
+            align-items: center;
+            margin-bottom: 18px;
+        }
+        .perfil-img {
+            width: 120px; height: 120px;
+            border-radius: 16px;
+            overflow: hidden;
+            background: #ffe6f6;
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 2px 12px #ff66cc33;
+        }
+        .perfil-img img {
+            width: 100%; height: 100%; object-fit: cover;
+        }
+        .perfil-nombre {
+            font-size: 2rem;
+            font-weight: 800;
+            color: #ff66cc;
+            margin-bottom: 2px;
+        }
+        .perfil-email, .perfil-tel {
+            color: #7a007a;
+            font-size: 1rem;
+            margin-bottom: 2px;
+        }
+        .perfil-editar {
+            margin-top: 10px;
+        }
+        .perfil-editar a {
+            background: linear-gradient(90deg,#ff66cc,#c51a8d);
+            color: #fff;
+            padding: 7px 18px;
+            border-radius: 20px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 14px;
+            box-shadow: 0 2px 8px #c51a8d22;
+        }
+        .perfil-editar a:hover {
+            background: linear-gradient(90deg,#c51a8d,#ff66cc);
+        }
+        .perfil-historial {
+            margin-top: 32px;
+        }
+        .perfil-historial h3 {
+            color: #c51a8d;
+            font-size: 1.2rem;
+            margin-bottom: 12px;
+        }
+        .pedido-item {
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px #ff66cc22;
+            padding: 14px 18px;
+            margin-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .pedido-id {
+            font-weight: 700;
+            color: #c51a8d;
+        }
+        .pedido-fecha {
+            color: #7a007a;
+            font-size: 0.95rem;
+        }
+        .pedido-total {
+            font-weight: 800;
+            color: #ff66cc;
+            font-size: 1.1rem;
+        }
+        .no-pedidos {
+            color: #999;
+            font-size: 1rem;
+            margin-top: 8px;
+        }
+    </style>
+</head>
+<body>
+    {% include 'navbar.html' %}
+    <main>
+        <div class="perfil-container">
+            <div class="perfil-header">
+                <div class="perfil-img">
+                    {% if usuario.profile_image %}
+                        <img src="{{ usuario.profile_image.url }}" alt="Foto de perfil">
+                    {% else %}
+                        <div style="font-size:48px; color:#c51a8d;">&#128100;</div>
+                    {% endif %}
+                </div>
+                <div>
+                    <div class="perfil-nombre">{{ usuario.nombre }}</div>
+                    <div class="perfil-email">{{ usuario.email }}</div>
+                    <div class="perfil-tel">Tel: {{ usuario.tel }}</div>
+                    <div class="perfil-editar">
+                        <a href="{% url 'editar_perfil' %}">Editar perfil</a>
+                    </div>
+                </div>
+            </div>
+            <div class="perfil-historial">
+                <h3>Historial de Compras</h3>
+                {% if pedidos %}
+                    {% for p in pedidos %}
+                            <div class="pedido-item">
+                                <div style="flex:1">
+                                    <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;">
+                                        <div>
+                                            <span class="pedido-id">Pedido #{{ p.id }}</span><br>
+                                            <span class="pedido-fecha">Fecha: {{ p.fecha|date:"d/m/Y H:i" }}</span>
+                                        </div>
+                                        <div class="pedido-total" style="font-weight:800;color:#ff66cc;text-align:right;">${{ p.total }}</div>
+                                    </div>
+
+                                    {% if p.detalles.exists %}
+                                        <div style="margin-top:10px;background:#fff7fb;border-radius:8px;padding:10px;border:1px solid #ffe6f4;">
+                                            <strong style="display:block;margin-bottom:6px;color:#c51a8d;">Productos:</strong>
+                                            <ul style="list-style:none;padding-left:0;margin:0;">
+                                                {% for det in p.detalles.all %}
+                                                    <li style="padding:6px 0;border-bottom:1px dashed #fde6f5;display:flex;justify-content:space-between;gap:12px;align-items:center;">
+                                                        <div style="flex:1;">
+                                                            <div style="font-weight:700;color:#2b0030;">{{ det.producto.nombre_producto }}</div>
+                                                            <div style="font-size:0.9rem;color:#7a007a;">{{ det.cantidad_producto }} × ${{ det.precio }}</div>
+                                                            <div style="font-size:0.85rem;color:#6b006b;margin-top:6px;">
+                                                                <span><strong>Artista:</strong> {{ det.producto.artista.nombre_artista }}</span>
+                                                                &nbsp;•&nbsp;
+                                                                <span><strong>Tipo:</strong> {{ det.producto.get_tipo_display }}</span>
+                                                                &nbsp;•&nbsp;
+                                                                <span><strong>Género:</strong> {{ det.producto.get_genero_display }}</span>
+                                                            </div>
+                                                        </div>
+                                                        <div style="font-weight:700;color:#c51a8d;">${{ det.total }}</div>
+                                                    </li>
+                                                {% endfor %}
+                                            </ul>
+                                        </div>
+                                    {% else %}
+                                        <div style="margin-top:10px;color:#999;">No hay detalles registrados para este pedido.</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="no-pedidos">No tienes pedidos aún.</div>
+                {% endif %}
+            </div>
+        </div>
+    </main>
+    {% include 'footer.html' %}
+</body>
+</html>

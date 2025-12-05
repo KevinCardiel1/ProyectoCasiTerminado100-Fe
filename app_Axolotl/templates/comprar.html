@@ -1,0 +1,255 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% if artista %}{{ artista.nombre_artista }}{% else %}Comprar{% endif %} - AXOLOTL MUSIC</title>
+    <link rel="stylesheet" href="{% static 'style.css' %}">
+    <style>
+        body { background: linear-gradient(180deg, #fff0fb 0%, #ffe6f6 100%); color: #2b0030; }
+        .comprar-container { max-width: 1200px; margin: 30px auto; padding: 20px 15px; }
+        
+        /* Artista Header */
+        .artist-frame { display: flex; flex-direction: column; align-items: center; background: #fff0fa; border-radius: 16px; padding: 30px 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); margin-bottom: 40px; }
+        .artist-frame img { width: 180px; height: 180px; object-fit: cover; border-radius: 50%; border: 4px solid #ff66cc; margin-bottom: 15px; }
+        .artist-frame h2 { color: #ff66cc; font-size: 32px; text-align: center; margin: 0; }
+        
+        /* Categorías y tarjetas */
+        .category-title { font-size: 24px; color: #2b0030; text-align: left; margin: 30px 0 15px 0; border-left: 4px solid #ff66cc; padding-left: 12px; }
+        .comprar-sections { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px; }
+        
+        /* Tarjeta de producto mejorada */
+        .comprar-card { background: #fff0fa; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.08); transition: 0.3s; display: flex; flex-direction: column; }
+        .comprar-card:hover { transform: translateY(-4px); box-shadow: 0 4px 16px rgba(0,0,0,0.12); }
+        
+        .comprar-card-img-wrapper { width: 100%; height: 200px; position: relative; overflow: hidden; }
+        .comprar-card-img { width: 100%; height: 100%; object-fit: cover; }
+        .novedad-badge { position: absolute; top: 8px; right: 8px; background: #ff66cc; color: #fff; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: 700; }
+        
+        .comprar-card-content { padding: 12px; flex-grow: 1; display: flex; flex-direction: column; }
+        .comprar-card h3 { color: #ff66cc; font-size: 16px; margin: 0 0 6px 0; font-weight: 700; }
+        .type-badge { display:inline-block; margin-left:8px; padding:4px 8px; background:#ffe6f6; color:#7a007a; border-radius:12px; font-size:12px; font-weight:700; }
+        .comprar-card .desc { color: #666; font-size: 13px; margin: 6px 0; flex-grow: 1; max-height: 60px; overflow: hidden; }
+        .comprar-card .price { color: #2b0030; font-size: 16px; font-weight: bold; margin: 8px 0; }
+        
+        .comprar-card-actions { display: flex; gap: 8px; padding: 0 12px 12px 12px; }
+        .buy-btn { flex: 1; padding: 8px 12px; background: linear-gradient(90deg, #ff66cc, #c51a8d); color: white; text-decoration: none; border-radius: 6px; font-weight: 600; font-size: 12px; transition: 0.3s; text-align: center; border: none; cursor: pointer; }
+        .buy-btn:hover { background: linear-gradient(90deg, #c51a8d, #9d0e60); transform: scale(1.02); }
+        .buy-btn.disabled { background: #999 !important; cursor: not-allowed; opacity: 0.7; }
+        
+        .back-link { display: inline-block; margin-top: 20px; padding: 10px 24px; background: linear-gradient(90deg, #5a005a, #c51a8d); color: white; text-decoration: none; border-radius: 20px; font-weight: 600; transition: 0.3s; }
+        .back-link:hover { background: linear-gradient(90deg, #7a007a, #ff4db8); }
+        
+        .no-products { text-align: center; padding: 40px 20px; color: #999; background: #fff0fa; border-radius: 8px; }
+        
+        @media (max-width: 600px) { 
+            .artist-frame img { width: 140px; height: 140px; } 
+            .artist-frame h2 { font-size: 24px; } 
+            .comprar-sections { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body style="display:flex;flex-direction:column;min-height:100vh;">
+    {% include "navbar.html" %}
+
+    <main style="flex:1;">
+        <section class="comprar-container">
+            <!-- Encabezado del artista -->
+            <div class="artist-frame">
+                {% if artista and artista.foto %}
+                    <img src="{{ artista.foto.url }}" alt="{{ artista.nombre_artista }}">
+                {% else %}
+                    <div style="width: 180px; height: 180px; background: linear-gradient(135deg, #ff66cc, #c51a8d); border-radius: 50%; border: 4px solid #ff66cc; display: flex; align-items: center; justify-content: center; color: white; font-size: 60px; margin-bottom: 15px;">🎤</div>
+                {% endif %}
+                                <h2 style="color:#ff66cc;font-size:32px;text-align:center;margin:0;text-decoration:none;cursor:default;">{{ artista.nombre_artista }}</h2>
+            </div>
+
+            <!-- Vinilos -->
+            {% if vinilos %}
+                <h3 class="category-title">🎵 Vinilos</h3>
+                <div class="comprar-sections">
+                    {% for item in vinilos %}
+                        <div class="comprar-card">
+                            <div class="comprar-card-img-wrapper">
+                                {% if item.img %}
+                                    <img src="{{ item.img.url }}" alt="{{ item.nombre_producto }}" class="comprar-card-img">
+                                {% else %}
+                                    <div style="width: 100%; height: 100%; background: linear-gradient(135deg, #ff66cc, #c51a8d); display: flex; align-items: center; justify-content: center; color: white; font-size: 40px;">🎵</div>
+                                {% endif %}
+                                {% if item.novedad %}<span class="novedad-badge">✨ Novedad</span>{% endif %}
+                            </div>
+                            <div class="comprar-card-content">
+                                <h3>
+                                    {{ item.nombre_producto }}
+                                    <span class="type-badge">
+                                        {% if item.tipo == 'vinilo' %}🎵{% elif item.tipo == 'cd' %}💿{% elif item.tipo == 'casete' %}📼{% endif %}
+                                        {{ item.get_tipo_display }}
+                                    </span>
+                                </h3>
+                                <p class="desc">{{ item.descripcion|truncatewords:15 }}</p>
+                                <p class="price">${{ item.precio }}</p>
+                                {% if item.stock is not None %}
+                                    {% if item.stock > 0 %}
+                                        <p style="font-size:13px;color:#666;margin-top:6px;"><strong>Quedan:</strong> {{ item.stock }} unidad{% if item.stock != 1 %}es{% endif %}</p>
+                                    {% else %}
+                                        <p style="font-size:13px;color:#b00020;margin-top:6px;font-weight:700;">Fuera de stock</p>
+                                    {% endif %}
+                                {% endif %}
+                                
+                            </div>
+                            <div class="comprar-card-actions">
+                                {% if item.stock <= 0 %}
+                                    <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;">
+                                        <span class="buy-btn disabled">Fuera de stock</span>
+                                        <small style="color:#999;">Agotado</small>
+                                    </div>
+                                {% else %}
+                                    {% if request.user.is_authenticated and not request.user.is_staff %}
+                                        <form method="post" action="{% url 'add_to_cart' item.id %}" style="flex: 1;">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="next" value="{% url 'comprar_frontend' %}?artista={{ artista.nombre_artista|urlencode }}">
+                                            <button type="submit" class="buy-btn">🛒 Carrito</button>
+                                        </form>
+                                        <a href="{% url 'finalizar_frontend' %}?artista={{ artista.nombre_artista|urlencode }}&producto={{ item.nombre_producto|urlencode }}&precio={{ item.precio }}" class="buy-btn">💳 Comprar</a>
+                                    {% elif request.user.is_authenticated and request.user.is_staff %}
+                                        <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;">
+                                            <span style="color:#c51a8d;font-size:13px;font-weight:700;">Cuenta administrativa — solo vista, no puede comprar</span>
+                                        </div>
+                                    {% else %}
+                                        <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;">
+                                            <span style="color:#c51a8d;font-size:13px;font-weight:600;">Inicia sesión para comprar o agregar al carrito</span>
+                                            <a href="{% url 'login_frontend' %}" class="buy-btn" style="background:#c51a8d;">Iniciar sesión</a>
+                                        </div>
+                                    {% endif %}
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            <!-- CDs -->
+            {% if cds %}
+                <h3 class="category-title">💿 CDs</h3>
+                <div class="comprar-sections">
+                    {% for item in cds %}
+                        <div class="comprar-card">
+                            <div class="comprar-card-img-wrapper">
+                                {% if item.img %}
+                                    <img src="{{ item.img.url }}" alt="{{ item.nombre_producto }}" class="comprar-card-img">
+                                {% else %}
+                                    <div style="width: 100%; height: 100%; background: linear-gradient(135deg, #ff66cc, #c51a8d); display: flex; align-items: center; justify-content: center; color: white; font-size: 40px;">💿</div>
+                                {% endif %}
+                                {% if item.novedad %}<span class="novedad-badge">✨ Novedad</span>{% endif %}
+                            </div>
+                            <div class="comprar-card-content">
+                                <h3>
+                                    {{ item.nombre_producto }}
+                                    <span class="type-badge">{% if item.tipo == 'vinilo' %}🎵{% elif item.tipo == 'cd' %}💿{% elif item.tipo == 'casete' %}📼{% endif %} {{ item.get_tipo_display }}</span>
+                                </h3>
+                                <p class="desc">{{ item.descripcion|truncatewords:15 }}</p>
+                                <p class="price">${{ item.precio }}</p>
+                                {% if item.stock is not None %}
+                                    {% if item.stock > 0 %}
+                                        <p style="font-size:13px;color:#666;margin-top:6px;"><strong>Quedan:</strong> {{ item.stock }} unidad{% if item.stock != 1 %}es{% endif %}</p>
+                                    {% else %}
+                                        <p style="font-size:13px;color:#b00020;margin-top:6px;font-weight:700;">Fuera de stock</p>
+                                    {% endif %}
+                                {% endif %}
+                            </div>
+                            <div class="comprar-card-actions">
+                                {% if request.user.is_authenticated and not request.user.is_staff %}
+                                    <form method="post" action="{% url 'add_to_cart' item.id %}" style="flex: 1;">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="next" value="{% url 'comprar_frontend' %}?artista={{ artista.nombre_artista|urlencode }}">
+                                        <button type="submit" class="buy-btn">🛒 Carrito</button>
+                                    </form>
+                                    <a href="{% url 'finalizar_frontend' %}?artista={{ artista.nombre_artista|urlencode }}&producto={{ item.nombre_producto|urlencode }}&precio={{ item.precio }}" class="buy-btn">💳 Comprar</a>
+                                {% elif request.user.is_authenticated and request.user.is_staff %}
+                                    <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;">
+                                        <span style="color:#c51a8d;font-size:13px;font-weight:700;">Cuenta administrativa — solo vista, no puede comprar</span>
+                                    </div>
+                                {% else %}
+                                    <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;">
+                                        <span style="color:#c51a8d;font-size:13px;font-weight:600;">Inicia sesión para comprar o agregar al carrito</span>
+                                        <a href="{% url 'login_frontend' %}" class="buy-btn" style="background:#c51a8d;">Iniciar sesión</a>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            <!-- Casetes -->
+            {% if cassettes %}
+                <h3 class="category-title">🎙️ Casetes</h3>
+                <div class="comprar-sections">
+                    {% for item in cassettes %}
+                        <div class="comprar-card">
+                            <div class="comprar-card-img-wrapper">
+                                {% if item.img %}
+                                    <img src="{{ item.img.url }}" alt="{{ item.nombre_producto }}" class="comprar-card-img">
+                                {% else %}
+                                    <div style="width: 100%; height: 100%; background: linear-gradient(135deg, #ff66cc, #c51a8d); display: flex; align-items: center; justify-content: center; color: white; font-size: 40px;">🎙️</div>
+                                {% endif %}
+                                {% if item.novedad %}<span class="novedad-badge">✨ Novedad</span>{% endif %}
+                            </div>
+                            <div class="comprar-card-content">
+                                <h3>
+                                    {{ item.nombre_producto }}
+                                    <span class="type-badge">{% if item.tipo == 'vinilo' %}🎵{% elif item.tipo == 'cd' %}💿{% elif item.tipo == 'casete' %}📼{% endif %} {{ item.get_tipo_display }}</span>
+                                </h3>
+                                <p class="desc">{{ item.descripcion|truncatewords:15 }}</p>
+                                <p class="price">${{ item.precio }}</p>
+                                {% if item.stock is not None %}
+                                    {% if item.stock > 0 %}
+                                        <p style="font-size:13px;color:#666;margin-top:6px;"><strong>Quedan:</strong> {{ item.stock }} unidad{% if item.stock != 1 %}es{% endif %}</p>
+                                    {% else %}
+                                        <p style="font-size:13px;color:#b00020;margin-top:6px;font-weight:700;">Fuera de stock</p>
+                                    {% endif %}
+                                {% endif %}
+                            </div>
+                            <div class="comprar-card-actions">
+                                {% if request.user.is_authenticated and not request.user.is_staff %}
+                                    <form method="post" action="{% url 'add_to_cart' item.id %}" style="flex: 1;">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="next" value="{% url 'comprar_frontend' %}?artista={{ artista.nombre_artista|urlencode }}">
+                                        <button type="submit" class="buy-btn">🛒 Carrito</button>
+                                    </form>
+                                    <a href="{% url 'finalizar_frontend' %}?artista={{ artista.nombre_artista|urlencode }}&producto={{ item.nombre_producto|urlencode }}&precio={{ item.precio }}" class="buy-btn">💳 Comprar</a>
+                                {% elif request.user.is_authenticated and request.user.is_staff %}
+                                    <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;">
+                                        <span style="color:#c51a8d;font-size:13px;font-weight:700;">Cuenta administrativa — solo vista, no puede comprar</span>
+                                    </div>
+                                {% else %}
+                                    <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;">
+                                        <span style="color:#c51a8d;font-size:13px;font-weight:600;">Inicia sesión para comprar o agregar al carrito</span>
+                                        <a href="{% url 'login_frontend' %}" class="buy-btn" style="background:#c51a8d;">Iniciar sesión</a>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            <!-- Sin productos -->
+            {% if not vinilos and not cds and not cassettes %}
+                <div class="no-products">
+                    <p>📭 No hay productos disponibles para este artista.</p>
+                </div>
+            {% endif %}
+
+            <div style="text-align: center; margin-top: 30px;">
+                <a href="{% url 'artistas_frontend' %}" class="back-link">← Volver a Artistas</a>
+            </div>
+        </section>
+    </main>
+
+    {% include "footer.html" %}
+    </body>
+    </html>
+</body>
+</html>

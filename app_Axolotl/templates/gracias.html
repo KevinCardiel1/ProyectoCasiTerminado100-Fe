@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+{% load static %}
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Gracias por tu compra - AXOLOTL MUSIC</title>
+    <link rel="stylesheet" href="{% static 'style.css' %}">
+    <style>
+        body { background: #ffdff3; color: #2b0030; font-family: Arial, sans-serif; }
+        .gracias-container { max-width: 700px; margin: 60px auto; padding: 24px; background: #fff0fa; border-radius: 14px; text-align: center; }
+        h1 { color: #c51a8d; }
+        .volver-btn { display:inline-block; margin-top:18px; padding:10px 18px; border-radius:12px; background:#c51a8d; color:#fff; text-decoration:none; font-weight:600; }
+        .detalle { margin-top:12px; padding:12px; background:#f7fff7; border:1px solid #dff6e9; border-radius:8px; }
+    </style>
+</head>
+<body>
+    {% include 'navbar.html' %}
+    <main>
+        <div class="gracias-container">
+            <h1>¡Gracias por tu compra!</h1>
+            <p>Tu pedido fue recibido correctamente. Te enviaremos un correo con los detalles.</p>
+
+            {% if pedido %}
+                <div class="detalle" id="detalle-orden">
+                    <strong>Pedido #{{ pedido.id }}</strong>
+                    <p><b>Cliente:</b> {{ pedido.usuario.nombre }}</p>
+                    <p><b>Fecha:</b> {{ pedido.fecha|date:"d/m/Y H:i" }}</p>
+                    <p><b>Cantidad total:</b> {{ pedido.cantidad_producto }}</p>
+                    <p><b>Total:</b> ${{ pedido.total }} MXN</p>
+                    <p><b>Seguimiento:</b> <span id="tracking-code">{{ tracking|default:'—' }}</span> <button id="copy-track" style="margin-left:8px;padding:6px 10px;border-radius:8px;background:#ff1493;color:#fff;border:none;cursor:pointer;">Copiar</button></p>
+                    {% if pedido.detalles.exists %}
+                        <hr>
+                        <div style="text-align:left;margin-top:8px;">
+                            <strong>Detalles:</strong>
+                            <ul>
+                                {% for det in pedido.detalles.all %}
+                                    <li>{{ det.producto.nombre_producto }} — {{ det.cantidad_producto }} x ${{ det.precio }} = ${{ det.total }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    {% endif %}
+                </div>
+            {% else %}
+                <div class="detalle" id="detalle-orden">
+                    <!-- Opcional: mostrar resumen desde localStorage si existe -->
+                    <strong>Resumen:</strong>
+                    <div id="resumen-datos">—</div>
+                </div>
+            {% endif %}
+
+            <a class="volver-btn" id="volver-principal" href="{% url 'index_frontend' %}">Volver a la página principal</a>
+        </div>
+    </main>
+
+    <script>
+        try {
+            // Si el servidor añadió ?cleared=1, limpiar el localStorage local también
+            const params = new URLSearchParams(window.location.search);
+            if (params.get('cleared')) {
+                try { localStorage.removeItem('compra_axolotl'); } catch (e) { }
+            }
+
+            const s = localStorage.getItem('compra_axolotl');
+            if (s) {
+                const obj = JSON.parse(s);
+                document.getElementById('resumen-datos').textContent = `${obj.producto || '—'} (${obj.artista || '—'}) — ${obj.precio || '—'} MXN`;
+            }
+        } catch (e) { /* ignore */ }
+        // Clear storage when user leaves via the back button
+        document.getElementById('volver-principal').addEventListener('click', function() {
+            try { localStorage.removeItem('compra_axolotl'); } catch (e) { }
+        });
+
+        // Copiar código de seguimiento
+        try {
+            const copyBtn = document.getElementById('copy-track');
+            const trackEl = document.getElementById('tracking-code');
+            if (copyBtn && trackEl) {
+                copyBtn.addEventListener('click', function() {
+                    const text = trackEl.textContent.trim();
+                    if (!text) return;
+                    navigator.clipboard?.writeText(text).then(function(){
+                        copyBtn.textContent = 'Copiado';
+                        setTimeout(()=> copyBtn.textContent = 'Copiar', 1500);
+                    }).catch(()=>{
+                        // fallback
+                        try { window.prompt('Copia el código de seguimiento:', text); } catch (e) {}
+                    });
+                });
+            }
+        } catch (e) { /* ignore */ }
+    </script>
+</body>
+</html>

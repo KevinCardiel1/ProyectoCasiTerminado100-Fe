@@ -1,0 +1,136 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{ tipo_nombre }} - AXOLOTL MUSIC</title>
+    <link rel="stylesheet" href="{% static 'style.css' %}">
+    <style>
+        body { background: linear-gradient(180deg, #fff0fb 0%, #ffe6f6 100%); color: #2b0030; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 30px 15px; }
+        .page-header { text-align: center; margin-bottom: 40px; }
+        .page-header h1 { color: #ff66cc; font-size: 38px; margin: 20px 0; }
+        .type-tabs { display: flex; gap: 10px; justify-content: center; margin-bottom: 30px; flex-wrap: wrap; }
+        .type-tabs a { padding: 10px 20px; border-radius: 20px; text-decoration: none; font-weight: 600; transition: 0.3s; border: 2px solid #ff66cc; color: #ff66cc; }
+        .type-tabs a.active { background: #ff66cc; color: white; }
+        .type-tabs a:hover { background: #ff66cc; color: white; }
+
+        /* Reuse genero styles for smaller, consistent cards */
+        .category-title { font-size: 24px; color: #2b0030; text-align: left; margin: 30px 0 15px 0; border-left: 4px solid #ff66cc; padding-left: 12px; }
+        .comprar-sections { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 20px; }
+        .comprar-card { background: #fff0fa; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.08); transition: 0.3s; display: flex; flex-direction: column; }
+        .comprar-card:hover { transform: translateY(-4px); box-shadow: 0 4px 16px rgba(0,0,0,0.12); }
+        .comprar-card-img-wrapper { position: relative; height: 150px; overflow: hidden; }
+        .comprar-card img { width: 100%; height: 100%; object-fit: cover; display:block; }
+        .novedad-badge { position: absolute; top: 8px; right: 8px; background: #ff66cc; color: #fff; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: 700; }
+        .comprar-card h3 { color: #ff66cc; font-size: 15px; margin: 10px 12px 4px; font-weight: 700; }
+        .type-badge { display:inline-block; margin-left:8px; padding:4px 8px; background:#ffe6f6; color:#7a007a; border-radius:12px; font-size:12px; font-weight:700; }
+        .comprar-card .artista { margin: 4px 12px; font-size: 12px; color: #666; font-weight: 600; }
+        .comprar-card .desc { margin: 6px 12px; font-size: 13px; color: #666; flex-grow: 1; max-height: 60px; overflow: hidden; }
+        .price { font-weight: 700; color: #2b0030; font-size: 15px; margin: 8px 12px 10px !important; }
+        .buy-btn { display: inline-block; margin: 0 12px 12px; padding: 8px 14px; background: linear-gradient(90deg, #ff66cc, #c51a8d); color: white; text-decoration: none; border-radius: 6px; font-weight: 600; font-size: 12px; transition: 0.3s; }
+        .buy-btn:hover { background: linear-gradient(90deg, #c51a8d, #9d0e60); }
+        .buy-btn.disabled { background: #999 !important; cursor: not-allowed; opacity: 0.7; }
+        .back-link { display: inline-block; margin-top: 20px; padding: 10px 24px; background: linear-gradient(90deg, #5a005a, #c51a8d); color: white; text-decoration: none; border-radius: 20px; font-weight: 600; transition: 0.3s; }
+        .back-link:hover { background: linear-gradient(90deg, #7a007a, #ff4db8); }
+        .no-products { text-align: center; padding: 40px 20px; color: #999; background: #fff0fa; border-radius: 8px; }
+        /* Responsive breakpoints: grid -> 2 cols -> 1 col */
+        @media (max-width: 900px) { .comprar-sections { grid-template-columns: repeat(2, 1fr); } .page-header h1 { font-size: 32px; } }
+        @media (max-width: 600px) { .comprar-sections { grid-template-columns: 1fr; } .comprar-card-img-wrapper { height: 180px; } .page-header h1 { font-size: 28px; } }
+    </style>
+</head>
+<body style="display:flex;flex-direction:column;min-height:100vh;">
+    {% include "navbar.html" %}
+    
+    <div class="container" style="flex:1;">
+        <div class="page-header">
+            <h1>{{ tipo_nombre }}</h1>
+            <p style="color: #666; font-size: 14px;">Explora todos nuestros {{ tipo_nombre|lower }}</p>
+        </div>
+        
+        <div class="type-tabs">
+            <a href="{% url 'tipo_frontend' %}?tipo=Vinilo" class="{% if tipo_param|lower == 'vinilo' %}active{% endif %}">🎵 Vinilos</a>
+            <a href="{% url 'tipo_frontend' %}?tipo=CD" class="{% if tipo_param|lower == 'cd' %}active{% endif %}">💿 CDs</a>
+            <a href="{% url 'tipo_frontend' %}?tipo=Casete" class="{% if tipo_param|lower == 'casete' %}active{% endif %}">📼 Casetes</a>
+        </div>
+        
+        {% if todos_productos %}
+            <div style="margin-bottom:14px; display:flex; justify-content:space-between; align-items:center;">
+                <div></div>
+                <div style="font-size:13px;color:#666;">Productos: <strong>{{ todos_productos.count }}</strong></div>
+            </div>
+
+            {# Mostrar una sola sección basada en el tipo (sin dividir por género). Visualmente igual que `genero.html` #}
+            <h3 class="category-title">{% if tipo_param|lower == 'vinilo' %}🎵 Vinilos{% elif tipo_param|lower == 'cd' %}💿 CDs{% elif tipo_param|lower == 'casete' %}📼 Casetes{% else %}Productos{% endif %}</h3>
+
+            <div class="comprar-sections">
+                {% for producto in todos_productos %}
+                    <div class="comprar-card">
+                        <div class="comprar-card-img-wrapper">
+                            {% if producto.img %}
+                                <img src="{{ producto.img.url }}" alt="{{ producto.nombre_producto }}">
+                            {% else %}
+                                <div style="width: 100%; height: 100%; background: linear-gradient(135deg, #ff66cc, #c51a8d); display: flex; align-items: center; justify-content: center; color: white; font-size: 40px;">{% if producto.tipo == 'vinilo' %}🎵{% elif producto.tipo == 'cd' %}💿{% elif producto.tipo == 'casete' %}📼{% else %}📦{% endif %}</div>
+                            {% endif %}
+                            {% if producto.novedad %}<span class="novedad-badge">✨ Novedad</span>{% endif %}
+                        </div>
+                        <h3>
+                            {{ producto.nombre_producto }}
+                            <span class="type-badge">{% if producto.tipo == 'vinilo' %}🎵{% elif producto.tipo == 'cd' %}💿{% elif producto.tipo == 'casete' %}📼{% endif %} {{ producto.get_tipo_display }}</span>
+                        </h3>
+                        <p class="artista" style="color:#c51a8d; font-weight:700; text-decoration:none; cursor:default;">{{ producto.artista.nombre_artista }}</p>
+                        <p class="desc">{{ producto.descripcion|truncatewords:15 }}</p>
+                        <p class="price">${{ producto.precio }}</p>
+
+                        {% if producto.stock is not None %}
+                            {% if producto.stock > 0 %}
+                                <p style="font-size:13px;color:#666;margin-top:6px;"><strong>Quedan:</strong> {{ producto.stock }} unidad{% if producto.stock != 1 %}es{% endif %}</p>
+                            {% else %}
+                                <p style="font-size:13px;color:#b00020;margin-top:6px;font-weight:700;">Fuera de stock</p>
+                            {% endif %}
+                        {% endif %}
+
+                        <div class="comprar-card-actions">
+                            {% if producto.stock <= 0 %}
+                                <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;">
+                                    <span class="buy-btn disabled">Fuera de stock</span>
+                                    <small style="color:#999;">Agotado</small>
+                                </div>
+                            {% else %}
+                                {% if request.user.is_authenticated and not request.user.is_staff %}
+                                    <form method="post" action="{% url 'add_to_cart' producto.id %}" style="flex: 1;">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="next" value="{% url 'tipo_frontend' %}?tipo={{ tipo_param }}">
+                                        <button type="submit" class="buy-btn">🛒 Carrito</button>
+                                    </form>
+                                    <a href="{% url 'finalizar_frontend' %}?artista={{ producto.artista.nombre_artista|urlencode }}&producto={{ producto.nombre_producto|urlencode }}&precio={{ producto.precio }}" class="buy-btn" onclick="return saveCompraAndNavigate(this,'{{ producto.artista.nombre_artista|escapejs }}','{{ producto.nombre_producto|escapejs }}','{{ producto.precio }}')">💳 Comprar</a>
+                                {% elif request.user.is_authenticated and request.user.is_staff %}
+                                    <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;">
+                                        <span style="color:#c51a8d;font-size:13px;font-weight:700;">Cuenta administrativa — solo vista, no puede comprar</span>
+                                    </div>
+                                {% else %}
+                                    <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;">
+                                        <span style="color:#c51a8d;font-size:13px;font-weight:600;">Inicia sesión para comprar o agregar al carrito</span>
+                                        <a href="{% url 'login_frontend' %}" class="buy-btn" style="background:#c51a8d;">Iniciar sesión</a>
+                                    </div>
+                                {% endif %}
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+            <div style="text-align: center; margin-top: 30px;">
+                <a href="{% url 'index_frontend' %}" class="back-link">← Volver al inicio</a>
+            </div>
+        {% else %}
+            <div class="no-products">
+                <p>📭 No hay {{ tipo_nombre|lower }} disponibles en este momento.</p>
+                <a href="{% url 'index_frontend' %}" style="color: #ff66cc; text-decoration: none; font-weight: 600;">← Volver al inicio</a>
+            </div>
+        {% endif %}
+    </div>
+    
+    {% include "footer.html" %}
+</body>
+</html>

@@ -1,0 +1,209 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>AXOLOTL MUSIC - Tienda Online</title>
+    <link rel="stylesheet" href="{% static 'style.css' %}">
+    <style>
+        .hero-modern {
+            background: linear-gradient(135deg, rgba(255, 20, 147, 0.95) 0%, rgba(139, 0, 139, 0.95) 100%);
+            min-height: 90vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            padding: 60px 20px;
+        }
+
+        .hero-modern::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -15%;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(0, 212, 255, 0.15), transparent);
+            border-radius: 50%;
+        }
+
+        .hero-modern::after {
+            content: '';
+            position: absolute;
+            bottom: -50%;
+            left: -15%;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.08), transparent);
+            border-radius: 50%;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            max-width: 700px;
+        }
+
+        .hero-icon {
+            font-size: 80px;
+            margin-bottom: 24px;
+            display: inline-block;
+            animation: bounce 3s ease-in-out infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+
+        .hero-title {
+            font-size: 4rem;
+            font-weight: 900;
+            margin: 0 0 16px 0;
+            color: white;
+            letter-spacing: 2px;
+            line-height: 1.1;
+        }
+
+        .hero-subtitle {
+            font-size: 1.3rem;
+            color: rgba(255, 255, 255, 0.95);
+            margin: 0 0 8px 0;
+            font-weight: 500;
+            letter-spacing: 1px;
+        }
+
+        .hero-desc {
+            font-size: 1rem;
+            color: rgba(255, 255, 255, 0.85);
+            margin: 16px 0 32px 0;
+            line-height: 1.6;
+        }
+
+        .hero-cta {
+            display: inline-block;
+            padding: 16px 48px;
+            background: white;
+            color: #ff1493;
+            text-decoration: none;
+            border-radius: 30px;
+            font-weight: 800;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+        }
+
+        .hero-cta:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .featured-artists {
+            padding: 80px 20px;
+            background: linear-gradient(180deg, white 0%, #f8f9fa 100%);
+        }
+
+        .featured-title {
+            text-align: center;
+            font-size: 2.4rem;
+            font-weight: 900;
+            color: #0a0a0a;
+            margin: 0 0 24px 0;
+            letter-spacing: 1px;
+        }
+
+        .featured-subtitle {
+            text-align: center;
+            font-size: 1rem;
+            color: #999;
+            margin: 0 0 48px 0;
+        }
+
+        .artists-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .artist-chip {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            background: linear-gradient(135deg, #ff69b4, #ff1493);
+            color: white;
+            border-radius: 16px;
+            text-decoration: none;
+            font-weight: 800;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 24px rgba(255, 20, 147, 0.2);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .artist-chip::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .artist-chip:hover::before {
+            left: 100%;
+        }
+
+        .artist-chip:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 16px 40px rgba(255, 20, 147, 0.3);
+        }
+
+        @media (max-width: 768px) {
+            .hero-title { font-size: 2.5rem; }
+            .hero-subtitle { font-size: 1rem; }
+            .featured-title { font-size: 1.8rem; }
+            .artists-grid { grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); }
+        }
+    </style>
+</head>
+<body style="display:flex;flex-direction:column;min-height:100vh;">
+    {% include "navbar.html" %}
+
+    <main style="flex:1;">
+        <section class="hero-modern">
+            <div class="hero-content">
+                <div class="hero-icon">🎵</div>
+                <h1 class="hero-title">AXOLOTL<br>MUSIC</h1>
+                <p class="hero-subtitle">La mejor tienda de música online</p>
+                <p class="hero-desc">Vinilos, CDs y Casetes de tus artistas favoritos • Entrega Rápida • Garantía Premium</p>
+                <a href="{% url 'catalogo_frontend' %}" class="hero-cta">Explorar Catálogo →</a>
+            </div>
+        </section>
+
+        <section class="featured-artists">
+            <h2 class="featured-title">🎤 Artistas Destacados</h2>
+            <p class="featured-subtitle">Descubre nuestros mejores artistas</p>
+            <div class="artists-grid">
+                {% for artista in artistas|slice:":8" %}
+                    <a href="{% url 'comprar_frontend' %}?artista={{ artista.nombre_artista|urlencode }}" class="artist-chip">
+                        {{ artista.nombre_artista }}
+                    </a>
+                {% endfor %}
+            </div>
+        </section>
+    </main>
+
+    {% include "footer.html" %}
+</body>
+</html>
